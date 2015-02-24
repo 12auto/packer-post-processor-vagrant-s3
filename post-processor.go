@@ -161,7 +161,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 	}
 	if size > 100*1024*1024 {
 		ui.Message("File size > 100MB. Initiating multipart upload")
-		multi, err := p.s3.Multi(boxPath, "application/octet-stream", "public-read")
+		multi, err := p.s3.Multi(boxPath, "application/octet-stream", "private")
 		if err != nil {
 			return nil, false, err
 		}
@@ -173,7 +173,7 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 			return nil, false, err
 		}
 	} else {
-		if err := p.s3.PutReader(boxPath, file, size, "application/octet-stream", "public-read"); err != nil {
+		if err := p.s3.PutReader(boxPath, file, size, "application/octet-stream", "private"); err != nil {
 			return nil, false, err
 		}
 	}
@@ -208,7 +208,7 @@ func (p *PostProcessor) putManifest(manifest *Manifest) error {
 	if err := json.NewEncoder(&buf).Encode(manifest); err != nil {
 		return err
 	}
-	if err := p.s3.Put(p.config.ManifestPath, buf.Bytes(), "application/json", "public-read"); err != nil {
+	if err := p.s3.Put(p.config.ManifestPath, buf.Bytes(), "application/json", "private"); err != nil {
 		return err
 	}
 	return nil
